@@ -21024,7 +21024,7 @@ function Cv(t, e) {
     const r = `/app-logs/${e}`;
     return {
         async logUserInApp(i) {
-            await t.post(`${r}/log-user-in-app/${i}`)
+            // await t.post(`${r}/log-user-in-app/${i}`)
         },
         async fetchLogs(i = {}) {
             return await t.get(r, {
