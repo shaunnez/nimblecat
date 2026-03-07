@@ -23126,26 +23126,27 @@ const r1 = typeof window > "u",
 
 function TO({}) {
     var a;
-    const e = xx().pathname.substring(1),
-        {
-            data: r,
-            isFetched: i
-        } = Nk({
-            queryKey: ["user"],
-            queryFn: async () => {
-                try {
-                    return {
-                        user: await uo.auth.me(),
-                        isAuthenticated: !0
-                    }
-                } catch {
-                    return {
-                        user: null,
-                        isAuthenticated: !1
-                    }
-                }
-            }
-        });
+    return <div>Hello</div>;
+    // const e = xx().pathname.substring(1),
+    //     {
+    //         data: r,
+    //         isFetched: i
+    //     } = Nk({
+    //         queryKey: ["user"],
+    //         queryFn: async () => {
+    //             try {
+    //                 return {
+    //                     user: await uo.auth.me(),
+    //                     isAuthenticated: !0
+    //                 }
+    //             } catch {
+    //                 return {
+    //                     user: null,
+    //                     isAuthenticated: !1
+    //                 }
+    //             }
+    //         }
+    //     });
     return C.jsx("div", {
         className: "min-h-screen flex items-center justify-center p-6 bg-slate-50",
         children: C.jsx("div", {
