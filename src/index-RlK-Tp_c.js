@@ -20758,25 +20758,65 @@ function bv(t, e) {
 function iN(t, e, r, i) {
     return {
         async me() {
-            //return t.get(`/apps/${r}/entities/User/me`)
+            return t.get(`/apps/${r}/entities/User/me`)
         },
         async updateMe(a) {
-            //return t.put(`/apps/${r}/entities/User/me`, a)
+            return t.put(`/apps/${r}/entities/User/me`, a)
         },
         redirectToLogin(a) {
-           
+            if (typeof window > "u") throw new Error("Login method can only be used in a browser environment");
+            const l = a ? new URL(a, window.location.origin).toString() : window.location.href,
+                c = `${i.appBaseUrl}/login?from_url=${encodeURIComponent(l)}`;
+            window.location.href = c
         },
         loginWithProvider(a, l = "/") {
-            
+            const c = new URL(l, window.location.origin).toString(),
+                f = `app_id=${r}&from_url=${encodeURIComponent(c)}`;
+            let h;
+            a === "sso" ? h = `/apps/${r}/auth/sso/login` : h = `/apps/auth${a==="google"?"":`/${a}`}/login`;
+            const m = `${i.appBaseUrl}/api${h}?${f}`;
+            window.location.href = m
         },
         logout(a) {
-           
+            if (delete t.defaults.headers.common.Authorization, typeof window < "u") {
+                if (window.localStorage) try {
+                    window.localStorage.removeItem("base44_access_token"), window.localStorage.removeItem("token")
+                } catch (f) {
+                    console.error("Failed to remove token from localStorage:", f)
+                }
+                const l = a || window.location.href,
+                    c = `${i.appBaseUrl}/api/apps/auth/logout?from_url=${encodeURIComponent(l)}`;
+                window.location.href = c
+            }
         },
         setToken(a, l = !0) {
-            
+            if (a && (t.defaults.headers.common.Authorization = `Bearer ${a}`, e.defaults.headers.common.Authorization = `Bearer ${a}`, l && typeof window < "u" && window.localStorage)) try {
+                window.localStorage.setItem("base44_access_token", a), window.localStorage.setItem("token", a)
+            } catch (c) {
+                console.error("Failed to save token to localStorage:", c)
+            }
         },
         async loginViaEmailPassword(a, l, c) {
-            
+            var f;
+            try {
+                const h = await t.post(`/apps/${r}/auth/login`, {
+                        email: a,
+                        password: l,
+                        ...c && {
+                            turnstile_token: c
+                        }
+                    }),
+                    {
+                        access_token: m,
+                        user: g
+                    } = h;
+                return m && this.setToken(m), {
+                    access_token: m,
+                    user: g
+                }
+            } catch (h) {
+                throw ((f = h.response) === null || f === void 0 ? void 0 : f.status) === 401 && await this.logout(), h
+            }
         },
         async isAuthenticated() {
             try {
@@ -20787,35 +20827,52 @@ function iN(t, e, r, i) {
             }
         },
         inviteUser(a, l) {
-            
+            return t.post(`/apps/${r}/users/invite-user`, {
+                user_email: a,
+                role: l
+            })
         },
         register(a) {
-            
+            return t.post(`/apps/${r}/auth/register`, a)
         },
         verifyOtp({
             email: a,
             otpCode: l
         }) {
-            
+            return t.post(`/apps/${r}/auth/verify-otp`, {
+                email: a,
+                otp_code: l
+            })
         },
         resendOtp(a) {
-            
+            return t.post(`/apps/${r}/auth/resend-otp`, {
+                email: a
+            })
         },
         resetPasswordRequest(a) {
-            
+            return t.post(`/apps/${r}/auth/reset-password-request`, {
+                email: a
+            })
         },
         resetPassword({
             resetToken: a,
             newPassword: l
         }) {
-           
+            return t.post(`/apps/${r}/auth/reset-password`, {
+                reset_token: a,
+                new_password: l
+            })
         },
         changePassword({
             userId: a,
             currentPassword: l,
             newPassword: c
         }) {
-            
+            return t.post(`/apps/${r}/auth/change-password`, {
+                user_id: a,
+                current_password: l,
+                new_password: c
+            })
         }
     }
 }
@@ -20823,7 +20880,11 @@ function iN(t, e, r, i) {
 function oN(t, e, r) {
     return {
         async getAccessToken(i) {
-           
+            const a = `/apps/${e}/auth/sso/accesstoken/${i}`,
+                l = {};
+            return r && (l["on-behalf-of"] = `Bearer ${r}`), t.get(a, {
+                headers: l
+            })
         }
     }
 }
@@ -20831,10 +20892,17 @@ function oN(t, e, r) {
 function aN(t, e) {
     return {
         async getAccessToken(r) {
-            
+            if (!r || typeof r != "string") throw new Error("Integration type is required and must be a string");
+            return (await t.get(`/apps/${e}/external-auth/tokens/${r}`)).access_token
         },
         async getConnection(r) {
-           
+            var i;
+            if (!r || typeof r != "string") throw new Error("Integration type is required and must be a string");
+            const l = await t.get(`/apps/${e}/external-auth/tokens/${r}`);
+            return {
+                accessToken: l.access_token,
+                connectionConfig: (i = l.connection_config) !== null && i !== void 0 ? i : null
+            }
         }
     }
 }
@@ -20871,13 +20939,29 @@ function nh(t = {}) {
 }
 
 function lN(t, e) {
-    
+    const {
+        storageKey: r = "base44_access_token"
+    } = e;
+    if (typeof window > "u" || !window.localStorage || !t) return !1;
+    try {
+        return window.localStorage.setItem(r, t), window.localStorage.setItem("token", t), !0
+    } catch (i) {
+        return console.error("Error saving token to local storage:", i), !1
+    }
 }
 
 function Ev(t, e) {
     return {
         async invoke(r, i) {
-           
+            if (typeof i == "string") throw new Error(`Function ${r} must receive an object with named parameters, received: ${i}`);
+            let a, l;
+            return i instanceof FormData || i && Object.values(i).some(c => c instanceof File) ? (a = new FormData, Object.keys(i).forEach(c => {
+                i[c] instanceof File ? a.append(c, i[c], i[c].name) : typeof i[c] == "object" && i[c] !== null ? a.append(c, JSON.stringify(i[c])) : a.append(c, i[c])
+            }), l = "multipart/form-data") : (a = i, l = "application/json"), t.post(`/apps/${e}/functions/${r}`, a || i, {
+                headers: {
+                    "Content-Type": l
+                }
+            })
         }
     }
 }
@@ -20943,17 +21027,27 @@ function Cv(t, e) {
             // await t.post(`${r}/log-user-in-app/${i}`)
         },
         async fetchLogs(i = {}) {
-          
+            return await t.get(r, {
+                params: i
+            })
         },
         async getStats(i = {}) {
-            
+            return await t.get(`${r}/stats`, {
+                params: i
+            })
         }
     }
 }
 
 function uN(t, e) {
     return {
-       
+        async inviteUser(r, i) {
+            if (i !== "user" && i !== "admin") throw new Error(`Invalid role: "${i}". Role must be either "user" or "admin".`);
+            return await t.post(`/apps/${e}/runtime/users/invite-user`, {
+                user_email: r,
+                role: i
+            })
+        }
     }
 }
 const Cn = Object.create(null);
@@ -23125,66 +23219,8 @@ const s1 = N.createContext(),
     PO = ({
         children: t
     }) => {
-        const [e, r] = N.useState(null), [i, a] = N.useState(!1), [l, c] = N.useState(!0), [f, h] = N.useState(!0), [m, g] = N.useState(null), [y, w] = N.useState(null);
-        N.useEffect(() => {
-            E()
-        }, []);
-        const E = async () => {
-            var R, V;
-            try {
-                h(!0), g(null);
-                const D = oo({
-                    baseURL: "/api/apps/public",
-                    headers: {
-                        "X-App-Id": lo.appId
-                    },
-                    token: lo.token,
-                    interceptResponses: !0
-                });
-                try {
-                    const M = await D.get(`/prod/public-settings/by-id/${lo.appId}`);
-                    w(M), lo.token ? await S() : (c(!1), a(!1)), h(!1)
-                } catch (M) {
-                    if (console.error("App state check failed:", M), M.status === 403 && ((V = (R = M.data) == null ? void 0 : R.extra_data) != null && V.reason)) {
-                        const B = M.data.extra_data.reason;
-                        g(B === "auth_required" ? {
-                            type: "auth_required",
-                            message: "Authentication required"
-                        } : B === "user_not_registered" ? {
-                            type: "user_not_registered",
-                            message: "User not registered for this app"
-                        } : {
-                            type: B,
-                            message: M.message
-                        })
-                    } else g({
-                        type: "unknown",
-                        message: M.message || "Failed to load app"
-                    });
-                    h(!1), c(!1)
-                }
-            } catch (D) {
-                console.error("Unexpected error:", D), g({
-                    type: "unknown",
-                    message: D.message || "An unexpected error occurred"
-                }), h(!1), c(!1)
-            }
-        }, S = async () => {
-            try {
-                c(!0);
-                const R = await uo.auth.me();
-                r(R), a(!0), c(!1)
-            } catch (R) {
-                console.error("User auth check failed:", R), c(!1), a(!1), (R.status === 401 || R.status === 403) && g({
-                    type: "auth_required",
-                    message: "Authentication required"
-                })
-            }
-        }, b = (R = !0) => {
-            r(null), a(!1), R ? uo.auth.logout(window.location.href) : uo.auth.logout()
-        }, x = () => {
-            uo.auth.redirectToLogin(window.location.href)
-        };
+        const [e, r] = N.useState(null), [i, a] = N.useState(!1), [l, c] = N.useState(!1), [f, h] = N.useState(!1), [m, g] = N.useState(null), [y, w] = N.useState(null);
+        const E = async () => {}, S = async () => {}, b = () => {}, x = () => {};
         return C.jsx(s1.Provider, {
             value: {
                 user: e,
