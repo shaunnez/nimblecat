@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>NimbleCat — Web Design, Apps &amp; Marketing · Auckland</title>
+<title>NimbleCat — Web Design &amp; Apps · Auckland</title>
 <meta property="og:title" content="NimbleCat — Make your business digital">
-<meta property="og:description" content="NimbleCat — web design, app development and marketing from Auckland, New Zealand, since 2012.">
+<meta property="og:description" content="NimbleCat — web design and app development from Auckland, New Zealand, since 2012.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="NimbleCat">
 <meta property="og:url" content="https://nimblecat.co.nz/">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23050505'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23f5c518'/%3E%3C/svg%3E">
-<meta name="description" content="NimbleCat — web design, app development and marketing from Auckland, New Zealand, since 2012.">
+<meta name="description" content="NimbleCat — web design and app development from Auckland, New Zealand, since 2012.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1;1,9..144,100..900,0..100,0..1&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
@@ -158,6 +158,7 @@ html:not(.anim) .hero-gem{display:none}
 .work-head .h2{margin-top:0;font-size:clamp(44px,6.4vw,108px)}
 .work-head p{color:var(--muted);text-align:right;font-size:14px;letter-spacing:.04em}
 .grid{flex:1;min-height:0;display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(4,1fr);gap:12px;perspective:1600px;perspective-origin:50% 40%}
+.tile:last-child{grid-column:span 2}
 .tile{position:relative;min-height:0;transform-style:preserve-3d;will-change:transform}
 .tile-in{position:absolute;inset:0;border-radius:14px;overflow:hidden;background:#151515;transform-style:preserve-3d;transition:box-shadow .5s}
 .tile img{width:100%;height:100%;object-fit:cover;object-position:top center;transition:transform 1s var(--ease)}
@@ -221,6 +222,7 @@ html:not(.anim) .cat{display:none}
   #work{height:auto;padding-top:18vh}
   .grid{grid-template-columns:repeat(2,1fr);grid-template-rows:none;grid-auto-rows:auto}
   .tile{aspect-ratio:4/3}
+  .tile:last-child{aspect-ratio:16/6}
   .tile .cap{opacity:1;transform:none;padding:22px 10px 8px}
   .work-head{flex-direction:column;align-items:flex-start}
   .work-head p{text-align:left}
@@ -274,7 +276,7 @@ html:not(.anim) .ms .label{opacity:1;transform:translate(0,-50%)}
   </svg>
   <div class="hero-tagline">
     <h1><span class="line"><span>Make your business</span></span><span class="line"><span><em>digital.</em></span></span></h1>
-    <p class="line"><span>Web design, apps &amp; marketing — from Auckland, since 2012.</span></p>
+    <p class="line"><span>Web design &amp; apps — from Auckland, since 2012.</span></p>
   </div>
   <div class="hero-ui">
     <div class="side">Web Development — Design — App Development</div>
@@ -287,7 +289,7 @@ html:not(.anim) .ms .label{opacity:1;transform:translate(0,-50%)}
 <section id="work" data-theme="dark">
   <div class="work-head">
     <div><div class="eyebrow">Portfolio</div><h2 class="h2">Selected <em>work.</em></h2></div>
-    <p>24 projects · Branding, Web, Mobile, Apps<br>From Auckland to London</p>
+    <p>23 projects · Branding, Web, Mobile, Apps<br>From Auckland to London</p>
   </div>
   <div class="grid" id="grid"></div>
 </section>
@@ -484,7 +486,7 @@ html:not(.anim) .ms .label{opacity:1;transform:translate(0,-50%)}
   const root = document.documentElement;
 
   const WORK = [
-    ['agent-harness.webp', 'Agent Harness', 'App, Web'],
+    ['agent-harness.webp', 'Agent Harness', 'App, Web', 'hero-only'],
     ['ceres-1.png', 'Ceres Organics', 'Branding, Mobile, Web'],
     ['bidedge.webp', 'BidEdge', 'Branding, Web, App'],
     ['air-nz.png', 'Air New Zealand', 'Web'],
@@ -521,7 +523,7 @@ html:not(.anim) .ms .label{opacity:1;transform:translate(0,-50%)}
     row.innerHTML = r.map(i => `<div class="mtile"><img src="${src(WORK[i][0])}" alt=""></div>`).join('');
     mosaic.appendChild(row);
   });
-  $('#grid').innerHTML = WORK.map(([f, n, t]) =>
+  $('#grid').innerHTML = WORK.filter(w => w[3] !== 'hero-only').map(([f, n, t]) =>
     `<figure class="tile"><div class="tile-in"><img src="${src(f)}" alt="${n}" loading="lazy"><figcaption class="cap"><b>${n}</b><small>${t}</small></figcaption></div></figure>`).join('');
 
   $$('.digit').forEach(d => {
