@@ -71,7 +71,7 @@ section{position:relative}
 .mtile img{width:100%;height:100%;object-fit:cover;object-position:top center}
 .hero-gem{position:absolute;inset:0;width:100%;height:100%;display:block;background:#050505}
 html:not(.anim) .hero-gem{display:none}
-.hero-scrim{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 50%,rgba(5,5,5,.55),rgba(5,5,5,.9));opacity:0;pointer-events:none}
+.hero-scrim{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 50%,rgba(5,5,5,.74),rgba(5,5,5,.9));opacity:0;pointer-events:none}
 #heroMask{position:absolute;inset:0;width:100%;height:100%;display:block}
 #heroMask .kt{font-family:'Fraunces',serif;font-weight:900;letter-spacing:-.02em;font-variation-settings:'SOFT' 0,'WONK' 0,'opsz' 144}
 .hero-ui{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;align-items:flex-end;padding:0 var(--g) 28px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:500;color:rgba(244,239,230,.7);gap:16px}
@@ -486,7 +486,6 @@ html:not(.anim) .ms .label{opacity:1;transform:translate(0,-50%)}
   const root = document.documentElement;
 
   const WORK = [
-    ['agent-harness.webp', 'Agent Harness', 'App, Web', 'hero-only'],
     ['ceres-1.png', 'Ceres Organics', 'Branding, Mobile, Web'],
     ['bidedge.webp', 'BidEdge', 'Branding, Web, App'],
     ['air-nz.png', 'Air New Zealand', 'Web'],
@@ -516,14 +515,14 @@ html:not(.anim) .ms .label{opacity:1;transform:translate(0,-50%)}
   /* ---------- build DOM ---------- */
   const mosaic = $('#mosaic');
   // centre tile sits behind the tagline, so keep a text-free shot there
-  const ROWS = [[10, 1, 2, 3, 4, 5, 6], [7, 8, 9, 0, 11, 12, 13], [14, 15, 16, 17, 18, 19, 20]];
+  const ROWS = [[9, 0, 1, 2, 3, 4, 5], [6, 8, 10, 7, 11, 12, 13], [14, 15, 16, 17, 18, 19, 20]];
   ROWS.forEach(r => {
     const row = document.createElement('div');
     row.className = 'mrow';
     row.innerHTML = r.map(i => `<div class="mtile"><img src="${src(WORK[i][0])}" alt=""></div>`).join('');
     mosaic.appendChild(row);
   });
-  $('#grid').innerHTML = WORK.filter(w => w[3] !== 'hero-only').map(([f, n, t]) =>
+  $('#grid').innerHTML = WORK.map(([f, n, t]) =>
     `<figure class="tile"><div class="tile-in"><img src="${src(f)}" alt="${n}" loading="lazy"><figcaption class="cap"><b>${n}</b><small>${t}</small></figcaption></div></figure>`).join('');
 
   $$('.digit').forEach(d => {
